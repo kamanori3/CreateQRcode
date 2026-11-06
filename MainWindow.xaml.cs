@@ -123,8 +123,19 @@ public partial class MainWindow : Window
         }
     }
 
+    private void ClearUrlButton_Click(object sender, RoutedEventArgs e)
+    {
+        UrlTextBox.Clear();
+        UrlTextBox.Focus();
+        StatusText.Text = "URLを貼り付けて、作成を押してください。";
+    }
+
     private void UrlTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
     {
+        ClearUrlButton.Visibility = string.IsNullOrEmpty(UrlTextBox.Text)
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+
         if (_encodedText is null)
         {
             return;
@@ -170,14 +181,15 @@ public partial class MainWindow : Window
 
     private static string SuggestFileName(string text)
     {
+        var prefix = DateTime.Now.ToString("yyyyMMddHHmm");
         if (Uri.TryCreate(text, UriKind.Absolute, out var uri) && !string.IsNullOrWhiteSpace(uri.Host))
         {
             var invalid = Path.GetInvalidFileNameChars();
             var host = string.Concat(uri.Host.Select(ch => invalid.Contains(ch) ? '_' : ch));
-            return "qrcode_" + host + ".png";
+            return prefix + "_qrcode_" + host + ".png";
         }
 
-        return "qrcode.png";
+        return prefix + "_qrcode.png";
     }
 
     private static string ApplySelectedFormat(string fileName, int filterIndex)

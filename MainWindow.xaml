@@ -78,6 +78,38 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="ClearButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#8B95A1"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="ToolTip" Value="URLを消す"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#EEF1F4"/>
+                                <Setter Property="Foreground" Value="#1C2430"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#E2E6EA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="28">
@@ -101,16 +133,25 @@
 
         <StackPanel Grid.Row="1" Margin="0,22,0,0">
             <TextBlock Text="URL" FontWeight="SemiBold" Foreground="#1C2430" Margin="0,0,0,8"/>
-            <TextBox x:Name="UrlTextBox"
-                     Height="42"
-                     Padding="12,0"
-                     VerticalContentAlignment="Center"
-                     FontSize="14"
-                     BorderBrush="#C9D1D9"
-                     BorderThickness="1"
-                     Background="White"
-                     TextChanged="UrlTextBox_TextChanged"
-                     KeyDown="UrlTextBox_KeyDown"/>
+            <Grid Height="42">
+                <TextBox x:Name="UrlTextBox"
+                         Padding="12,0,36,0"
+                         VerticalContentAlignment="Center"
+                         FontSize="14"
+                         BorderBrush="#C9D1D9"
+                         BorderThickness="1"
+                         Background="White"
+                         TextChanged="UrlTextBox_TextChanged"
+                         KeyDown="UrlTextBox_KeyDown"/>
+                <Button x:Name="ClearUrlButton"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Margin="0,0,6,0"
+                        Content="✕"
+                        Style="{StaticResource ClearButton}"
+                        Visibility="Collapsed"
+                        Click="ClearUrlButton_Click"/>
+            </Grid>
         </StackPanel>
 
         <StackPanel Grid.Row="2" Margin="0,14,0,0">
