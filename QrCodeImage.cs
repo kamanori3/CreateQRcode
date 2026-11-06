@@ -9,6 +9,12 @@ namespace CreateQRcode;
 
 internal static class QrCodeImage
 {
+    /// <summary>
+    /// 文字列を QR コードの PNG バイト列にする。
+    /// </summary>
+    /// <param name="text">符号化する文字列。</param>
+    /// <returns>余白付きの白黒 PNG。</returns>
+    /// <exception cref="QRCoder.Exceptions.DataTooLongException">文字列が QR コードの容量を超えたとき。</exception>
     public static byte[] CreatePng(string text)
     {
         using var generator = new QRCodeGenerator();
@@ -24,6 +30,11 @@ internal static class QrCodeImage
         return qrCode.GetGraphic(pixelsPerModule: 20, drawQuietZones: true);
     }
 
+    /// <summary>
+    /// PNG バイト列を画面表示用のビットマップにする。
+    /// </summary>
+    /// <param name="pngBytes">表示する PNG。</param>
+    /// <returns>ストリームを閉じたあとも使える、固定済みのビットマップ。</returns>
     public static BitmapSource ToBitmap(byte[] pngBytes)
     {
         using var stream = new MemoryStream(pngBytes);
@@ -36,6 +47,12 @@ internal static class QrCodeImage
         return image;
     }
 
+    /// <summary>
+    /// PNG バイト列を指定パスへ保存する。拡張子が PNG 以外なら JPEG または BMP に変換する。
+    /// </summary>
+    /// <param name="pngBytes">保存する PNG。</param>
+    /// <param name="path">拡張子を含む保存先パス。</param>
+    /// <exception cref="InvalidOperationException">拡張子が PNG、JPEG、BMP のいずれでもないとき。</exception>
     public static void Save(byte[] pngBytes, string path)
     {
         var extension = Path.GetExtension(path).ToLowerInvariant();
@@ -61,6 +78,11 @@ internal static class QrCodeImage
         encoder.Save(file);
     }
 
+    /// <summary>
+    /// QR コードの画像をクリップボードへ置く。ビットマップと元の PNG の両方を載せる。
+    /// </summary>
+    /// <param name="pngBytes">コピーする PNG。</param>
+    /// <exception cref="ExternalException">クリップボードを開けなかったとき。</exception>
     public static void CopyToClipboard(byte[] pngBytes)
     {
         var source = ToBitmap(pngBytes);

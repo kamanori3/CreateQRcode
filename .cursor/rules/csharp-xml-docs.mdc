@@ -1,0 +1,25 @@
+---
+description: C# の各関数に XML ドキュメントコメントを付ける
+globs: **/*.cs
+alwaysApply: false
+---
+
+# C# のドキュメントコメント
+
+関数、コンストラクタ、プロパティを追加または変更するときは、C# 標準の XML ドキュメントコメントを付ける。既存の関数を変更するとき、コメントが無ければ追加する。
+
+- `/// <summary>` で、何をするかを書く。
+- 引数があるときは `/// <param name="...">` を付ける。
+- 戻り値があるときは `/// <returns>` を付ける。
+- 呼び出し側が受ける例外を投げるときは `/// <exception cref="...">` を付ける。
+- コメントは日本語で、処理の内容が分かる文にする。名前の繰り返しだけにしない。
+
+```csharp
+/// <summary>
+/// 文字列を QR コードの PNG バイト列にする。
+/// </summary>
+/// <param name="text">符号化する文字列。</param>
+/// <returns>余白付きの白黒 PNG。</returns>
+/// <exception cref="QRCoder.Exceptions.DataTooLongException">文字列が QR コードの容量を超えたとき。</exception>
+public static byte[] CreatePng(string text)
+```

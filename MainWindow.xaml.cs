@@ -11,17 +11,37 @@ public partial class MainWindow : Window
     private byte[]? _pngBytes;
     private string? _encodedText;
 
+    /// <summary>
+    /// メイン画面を初期化する。
+    /// </summary>
     public MainWindow()
     {
         InitializeComponent();
     }
 
+    /// <summary>
+    /// URL 欄の内容から QR コードを作り、プレビューに表示する。
+    /// </summary>
+    /// <param name="sender">イベントの送信元。</param>
+    /// <param name="e">イベントデータ。</param>
     private void CreateButton_Click(object sender, RoutedEventArgs e)
     {
         var text = UrlTextBox.Text.Trim();
         if (string.IsNullOrEmpty(text))
         {
             StatusText.Text = "URLを入力してください。";
+            UrlTextBox.Focus();
+            return;
+        }
+
+        if (!IsAbsoluteUrl(text))
+        {
+            MessageBox.Show(
+                this,
+                "URL以外は変換できません。",
+                "警告",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
             UrlTextBox.Focus();
             return;
         }
@@ -44,6 +64,11 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// 表示中の QR コードを、選んだ場所と形式で保存する。
+    /// </summary>
+    /// <param name="sender">イベントの送信元。</param>
+    /// <param name="e">イベントデータ。</param>
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         if (_pngBytes is null || _encodedText is null)
@@ -92,6 +117,11 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// 表示中の QR コードをクリップボードへコピーする。
+    /// </summary>
+    /// <param name="sender">イベントの送信元。</param>
+    /// <param name="e">イベントデータ。</param>
     private void CopyButton_Click(object sender, RoutedEventArgs e)
     {
         if (_pngBytes is null || _encodedText is null)
@@ -123,6 +153,11 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// URL 欄を空にし、入力待ちの表示に戻す。
+    /// </summary>
+    /// <param name="sender">イベントの送信元。</param>
+    /// <param name="e">イベントデータ。</param>
     private void ClearUrlButton_Click(object sender, RoutedEventArgs e)
     {
         UrlTextBox.Clear();
@@ -130,6 +165,11 @@ public partial class MainWindow : Window
         StatusText.Text = "URLを貼り付けて、作成を押してください。";
     }
 
+    /// <summary>
+    /// URL の有無で ✕ の表示を切り替え、作成後に内容が変わったらプレビューを消す。
+    /// </summary>
+    /// <param name="sender">イベントの送信元。</param>
+    /// <param name="e">変更内容。</param>
     private void UrlTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
     {
         ClearUrlButton.Visibility = string.IsNullOrEmpty(UrlTextBox.Text)
@@ -150,6 +190,11 @@ public partial class MainWindow : Window
         StatusText.Text = "URLが変わったので、もう一度作成してください。";
     }
 
+    /// <summary>
+    /// URL 欄で Enter が押されたとき、QR コードを作成する。
+    /// </summary>
+    /// <param name="sender">イベントの送信元。</param>
+    /// <param name="e">押されたキー。</param>
     private void UrlTextBox_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
@@ -159,6 +204,11 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// 作成した QR コードをプレビューし、コピーと保存を可能にする。
+    /// </summary>
+    /// <param name="text">符号化した文字列。</param>
+    /// <param name="png">表示する PNG。</param>
     private void ShowQrCode(string text, byte[] png)
     {
         _encodedText = text;
@@ -169,6 +219,9 @@ public partial class MainWindow : Window
         SaveButton.IsEnabled = true;
     }
 
+    /// <summary>
+    /// プレビューを消し、コピーと保存を押せなくする。
+    /// </summary>
     private void ClearPreview()
     {
         _encodedText = null;
@@ -179,6 +232,21 @@ public partial class MainWindow : Window
         SaveButton.IsEnabled = false;
     }
 
+    /// <summary>
+    /// スキーム付きの絶対 URL かどうかを判定する。文字列は書き換えない。
+    /// </summary>
+    /// <param name="text">判定する文字列。</param>
+    /// <returns>絶対 URL なら true。</returns>
+    private static bool IsAbsoluteUrl(string text)
+    {
+        return Uri.TryCreate(text, UriKind.Absolute, out _);
+    }
+
+    /// <summary>
+    /// 保存ダイアログの初期ファイル名を、日時の接頭辞付きで作る。
+    /// </summary>
+    /// <param name="text">QR コードにした文字列。</param>
+    /// <returns><c>yyyyMMddHHmm_qrcode_ホスト名.png</c>。ホストが取れないときは <c>yyyyMMddHHmm_qrcode.png</c>。</returns>
     private static string SuggestFileName(string text)
     {
         var prefix = DateTime.Now.ToString("yyyyMMddHHmm");
@@ -192,6 +260,12 @@ public partial class MainWindow : Window
         return prefix + "_qrcode.png";
     }
 
+    /// <summary>
+    /// 保存ダイアログで選んだ形式に、ファイル名の拡張子を合わせる。
+    /// </summary>
+    /// <param name="fileName">ダイアログが返したファイル名。</param>
+    /// <param name="filterIndex">選択中のフィルタ。1 が PNG、2 が JPEG、3 が BMP。</param>
+    /// <returns>選んだ形式の拡張子を持つファイル名。JPEG で <c>.jpeg</c> と指定された場合はそのまま。</returns>
     private static string ApplySelectedFormat(string fileName, int filterIndex)
     {
         var selected = filterIndex switch

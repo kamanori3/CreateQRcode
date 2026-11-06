@@ -25,3 +25,7 @@ Windows 向けの WPF アプリ。貼り付けたリンクから QR コードを
 | `CreateQRcode.csproj` | プロジェクト設定とパッケージ参照 |
 
 画面の状態は `MainWindow` が持つ。生成済み PNG は `_pngBytes`、その元になった文字列は `_encodedText`。
+
+## コメント
+
+C# の関数、コンストラクタ、プロパティには、標準の XML ドキュメントコメント（`/// <summary>`、`param`、`returns`、`exception`）を付ける。コメントは日本語で、処理の内容が分かる文にする。
